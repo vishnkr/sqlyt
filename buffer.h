@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define META_SUCCESS 0
+#define META_FAILURE -1
+
 
 typedef struct {
     char* buffer;
