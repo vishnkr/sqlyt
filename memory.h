@@ -7,8 +7,8 @@
 
 typedef struct Row{
     int row_id;
-    char* col1[SAMPLE_COLUMN_SIZE_1]; //currently test table with only 3 columns, future plans to expand to more columns
-    char* col2[SAMPLE_COLUMN_SIZE_2];
+    char col1[SAMPLE_COLUMN_SIZE_1]; //currently test table with only 3 columns, future plans to expand to more columns
+    char col2[SAMPLE_COLUMN_SIZE_2];
 } Row;
 
 typedef struct Table{

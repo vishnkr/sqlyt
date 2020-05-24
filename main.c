@@ -62,7 +62,7 @@ int prepare_sql_statement(Statement* statement, InputBuffer* input_buffer){
     else if (strncmp(input_buffer->buffer,"insert",6)==0){
         printf("insert found\n");
         statement->type = INSERT_STATEMENT;
-        sscanf(input_buffer->buffer,"insert %d %s %s",&(statement->insert_row.row_id),(statement->insert_row).col1,(statement->insert_row).col2);
+        sscanf(input_buffer->buffer,"insert %d %s %s",&((statement->insert_row).row_id),(statement->insert_row).col1,(statement->insert_row).col2);
     } 
     else{
         printf("invalid statement\n");
