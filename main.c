@@ -24,6 +24,7 @@ typedef struct Statement{
 }Statement;
 
 int execute_insert(Statement* statement, Table* table);
+int execute_select(Statement* statement, Table* table);
 
 void print_help_info(){
     printf("Welcome to SQLyt - a simple sqlite clone\n");
@@ -73,7 +74,7 @@ int prepare_sql_statement(Statement* statement, InputBuffer* input_buffer){
 void execute_sql_statement(Statement* statement, Table* table){
     switch(statement->type){
         case SELECT_STATEMENT:
-            //TODO perform select operation
+            execute_select(statement,table);
             break;
         case INSERT_STATEMENT:
             execute_insert(statement,table);
@@ -90,6 +91,13 @@ void serialize_data(Row* src_row, void* dest_row){
     
 }
 
+void deserialize_data(void* src_row, Row* dest_row){
+    memcpy(&(dest_row->row_id),src_row,ROW_ID_SIZE);
+    memcpy(&(dest_row->col1),src_row+COL_1_OFFSET,COL_1_SIZE);
+    memcpy(&(dest_row->col2),src_row+COL_2_OFFSET,COL_2_SIZE);
+
+}   
+
 int execute_insert(Statement* statement, Table* table){
     //check if table is full
     if(table->number_of_rows==MAX_ROWS){
@@ -101,9 +109,19 @@ int execute_insert(Statement* statement, Table* table){
 
 }
 
+int execute_select(Statement* statement, Table* table){
+    Row ret_row;
+    for(int row=0;row<table->number_of_rows;row++){
+        deserialize_data(get_row_insert_location(table,row),&ret_row);
+        printf("%d| %s| %s\n",ret_row.row_id,ret_row.col1,ret_row.col2);
+    }
+    return 0;
+}
+
 int main(int argc, char* argv[]){
     print_help_info();
     InputBuffer* input_buffer = new_input_buffer();
+    Table* sample_table = init_table();
     while(true){
         print_prompt();
         read_input_buffer(input_buffer);
@@ -119,12 +137,11 @@ int main(int argc, char* argv[]){
         }
 
         Statement sql_statement;
-        Table* sample_table = init_table();
         switch (prepare_sql_statement(&sql_statement,input_buffer))
         {
             case STATEMENT_SUCCESS:
                 execute_sql_statement(&sql_statement,sample_table);
-                free_table(sample_table);
+                //free_table(sample_table);
                 break;
             case STATEMENT_FAILURE: //not possible currently
                 break;

@@ -37,14 +37,14 @@ Table* init_table(){
 
 void* get_row_insert_location(Table* table, int row_number){
     int page_num,row_offset,byte_offset;
-    page_num = row_number/ROWS_PER_PAGE;
-    void* page = table->pages[page_num];
-    if (page==NULL){
-        page = malloc(PAGE_SIZE);
+    page_num = row_number / ROWS_PER_PAGE;
+    void *page = table->pages[page_num];
+    if (page == NULL) {
+        page = table->pages[page_num] = malloc(PAGE_SIZE);
     }
-    row_offset = row_number/ROWS_PER_PAGE;
-    byte_offset = row_offset*ROW_SIZE;
-    return page+byte_offset;
+    row_offset = row_number % ROWS_PER_PAGE;
+    byte_offset = row_offset * ROW_SIZE;
+    return page + byte_offset;
 }
 
 void free_table(Table* table){
