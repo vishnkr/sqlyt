@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #define SAMPLE_COLUMN_SIZE_1 50
 #define SAMPLE_COLUMN_SIZE_2 255
@@ -35,17 +36,24 @@ const uint32_t MAX_ROWS = ROWS_PER_PAGE*MAX_PAGES_PER_TABLE;
 const uint32_t COL_1_OFFSET= ROW_ID_SIZE;
 const uint32_t COL_2_OFFSET = COL_1_SIZE+COL_1_OFFSET;
 
-Table* init_sqlyt_db(const char* file_handle){
+Table* init_sqlyt_db(const char* file_name){
     Table* new_table = (Table*)malloc(sizeof(Table));
-    int new_fd = open(file_handle,S_IWUSR|S_IRUSR|O_RDWR);//user write,read and open with read/write
+    mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+    const char* file_path = "db_files/";
+    char *result = malloc(strlen(file_path) + strlen(file_name) + 1);
+    strcpy(result, file_path);
+    strcat(result, file_name);
+    int new_fd = open(result,O_RDWR|O_CREAT,mode);//user write,read and open with read/write
     Pager* new_pager = (Pager*)malloc(sizeof(Pager));
     new_pager->fd = new_fd;
-    new_pager->flength=0;
+    new_pager->flength= lseek(new_fd, 0, SEEK_END);
     new_table->file_pager = new_pager;
-    new_table->number_of_rows=0;
+    uint32_t num_rows = new_pager->flength / ROW_SIZE;
+    new_table->number_of_rows=num_rows;
     for(int i =0;i<MAX_PAGES_PER_TABLE;i++){
         new_table->file_pager->pages[i]=NULL;
     }
+    free(result);
     return new_table;
 }
 
@@ -53,35 +61,45 @@ void* get_page_data(Pager* pager,int page_number){
     int used_page_count;
     if(pager->pages[page_number]==NULL){
         pager->pages[page_number] = malloc(PAGE_SIZE);
+        used_page_count = pager->flength/PAGE_SIZE;
+        if (pager->flength % PAGE_SIZE) {
+            used_page_count += 1;
+        }
+        if (page_number<=used_page_count){
+            lseek(pager->fd, page_number * PAGE_SIZE, SEEK_SET);
+            int bytes_read = read(pager->fd,pager->pages[page_number],PAGE_SIZE);
+            printf("read:%d\n",bytes_read);
+        }
     }
-    used_page_count = pager->flength/PAGE_SIZE;
-    if (page_number<=used_page_count){
-        lseek(pager->fd, page_number * PAGE_SIZE, SEEK_SET);
-        ssize_t bytes_read = read(pager->fd,pager->pages[page_number],PAGE_SIZE);
-    }
-
     return pager->pages[page_number];
 }
 
-int write_page_data(){
-
+int flush_page_data(Pager* pager, int page_number,int size){
+    int offset = lseek(pager->fd, page_number * PAGE_SIZE, SEEK_SET);
+    int written_bytes = write(pager->fd,pager->pages[page_number],size);
+    printf("offset:%d, written:%d",offset,written_bytes);
+    return 0;
 }
 
 void close_sqlyt_db(Table* table){
-    Pager* pager = table->file_pager;
     uint32_t full_pages_count = table->number_of_rows/ROWS_PER_PAGE;
-
-    free_pager_table(table);
+    for (int i = 0; i <= full_pages_count; i++) {
+        if (table->file_pager->pages[i] == NULL) {
+            continue;
+        }
+        printf("%d ",i);
+        flush_page_data(table->file_pager, i, table->number_of_rows*ROW_SIZE);
+        free(table->file_pager->pages[i]);
+        table->file_pager->pages[i] = NULL;
+    }
+    int close_result = close(table->file_pager->fd);
+    printf("close:%d\n",close_result);
 }
-
 
 void* get_row_insert_location(Table* table, int row_number){
     int page_num,row_offset,byte_offset;
     page_num = row_number / ROWS_PER_PAGE;
-    void *page = table->file_pager->pages[page_num];
-    if (page == NULL) {
-        page = table->file_pager->pages[page_num] = malloc(PAGE_SIZE);
-    }
+    void* page = get_page_data(table->file_pager, page_num);
     row_offset = row_number % ROWS_PER_PAGE;
     byte_offset = row_offset * ROW_SIZE;
     return page + byte_offset;
@@ -93,7 +111,6 @@ void free_pager_table(Table* table){
     }
     free(table->file_pager);
     free(table);
-    
 }
 
 

@@ -40,6 +40,8 @@ int process_meta_command(InputBuffer* input_buffer,Table* table){
     if(strncmp(input_buffer->buffer,".",1)==0){
     if(strncmp(input_buffer->buffer+1,"exit",4)==0){
         close_sqlyt_db(table);
+        printf("hello");
+        free_pager_table(table);
         clear_input_buffer(input_buffer);
     }
     else if(strncmp(input_buffer->buffer+1,"info",4)==0){
@@ -89,14 +91,12 @@ void serialize_data(Row* src_row, void* dest_row){
     memcpy(dest_row,&(src_row->row_id),ROW_ID_SIZE);
     memcpy(dest_row+COL_1_OFFSET,&(src_row->col1),COL_1_SIZE);
     memcpy(dest_row+COL_2_OFFSET,&(src_row->col2),COL_2_SIZE);
-    
 }
 
 void deserialize_data(void* src_row, Row* dest_row){
     memcpy(&(dest_row->row_id),src_row,ROW_ID_SIZE);
     memcpy(&(dest_row->col1),src_row+COL_1_OFFSET,COL_1_SIZE);
     memcpy(&(dest_row->col2),src_row+COL_2_OFFSET,COL_2_SIZE);
-
 }   
 
 int execute_insert(Statement* statement, Table* table){
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]){
     print_help_info();
     InputBuffer* input_buffer = new_input_buffer();
     Table* sample_table = init_sqlyt_db(argv[1]);
-    printf("Opening file: %s\n",argv[1]);
+    printf("Opening file: db_files/%s\n",argv[1]);
     while(true){
         print_prompt();
         read_input_buffer(input_buffer);
@@ -151,4 +151,5 @@ int main(int argc, char* argv[]){
         }
     }
     printf("\n");
+    return 0;
 }

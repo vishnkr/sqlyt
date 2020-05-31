@@ -1,8 +1,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 #define META_SUCCESS 0
 #define META_FAILURE -1
