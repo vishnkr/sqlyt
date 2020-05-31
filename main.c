@@ -36,10 +36,11 @@ void print_prompt(){
     printf("sqlyt db > ");
 }
 
-int process_meta_command(InputBuffer* input_buffer){
+int process_meta_command(InputBuffer* input_buffer,Table* table){
     if(strncmp(input_buffer->buffer,".",1)==0){
     if(strncmp(input_buffer->buffer+1,"exit",4)==0){
-            clear_input_buffer(input_buffer);
+        close_sqlyt_db(table);
+        clear_input_buffer(input_buffer);
     }
     else if(strncmp(input_buffer->buffer+1,"info",4)==0){
         print_help_info();
@@ -121,12 +122,13 @@ int execute_select(Statement* statement, Table* table){
 int main(int argc, char* argv[]){
     print_help_info();
     InputBuffer* input_buffer = new_input_buffer();
-    Table* sample_table = init_table();
+    Table* sample_table = init_sqlyt_db(argv[1]);
+    printf("Opening file: %s\n",argv[1]);
     while(true){
         print_prompt();
         read_input_buffer(input_buffer);
         if(input_buffer)
-        switch(process_meta_command(input_buffer)){
+        switch(process_meta_command(input_buffer,sample_table)){
             case META_SUCCESS:
                 break;
             case META_FAILURE:
@@ -135,7 +137,6 @@ int main(int argc, char* argv[]){
             default:
                 break;
         }
-
         Statement sql_statement;
         switch (prepare_sql_statement(&sql_statement,input_buffer))
         {
@@ -148,8 +149,6 @@ int main(int argc, char* argv[]){
             default:
                 break;
         }
-        
-        
     }
     printf("\n");
 }
