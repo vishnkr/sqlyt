@@ -26,6 +26,13 @@ typedef struct Table{
     Pager* file_pager;
 } Table;
 
+
+typedef struct Cursor{
+    int row_number;
+    Table* table;
+    bool is_end;
+} Cursor;
+
 const uint32_t ROW_ID_SIZE = get_member_size(Row,row_id);
 const uint32_t COL_1_SIZE = get_member_size(Row,col1);
 const uint32_t COL_2_SIZE = get_member_size(Row,col2);
@@ -35,6 +42,15 @@ const uint32_t ROWS_PER_PAGE = PAGE_SIZE/ROW_SIZE;
 const uint32_t MAX_ROWS = ROWS_PER_PAGE*MAX_PAGES_PER_TABLE; 
 const uint32_t COL_1_OFFSET= ROW_ID_SIZE;
 const uint32_t COL_2_OFFSET = COL_1_SIZE+COL_1_OFFSET;
+
+
+Cursor* init_start_cursor(Table* table){
+    Cursor* cursor = malloc(sizeof(Cursor));
+    cursor->is_end = (table->number_of_rows==0)? true: false;
+    cursor->row_number = 0;
+    cursor->table= table;
+    return cursor;
+}
 
 Table* init_sqlyt_db(const char* file_name){
     Table* new_table = (Table*)malloc(sizeof(Table));
@@ -55,6 +71,21 @@ Table* init_sqlyt_db(const char* file_name){
     }
     free(result);
     return new_table;
+}
+
+Cursor* init_end_cursor(Table* table){
+    Cursor* cursor = malloc(sizeof(Cursor));
+    cursor->is_end = true;
+    cursor->row_number = table->number_of_rows;
+    cursor->table = table;
+    return cursor;
+}
+
+void increment_cursor(Cursor* cursor){
+    cursor->row_number+=1;
+    if(cursor->row_number>=cursor->table->number_of_rows){
+        cursor->is_end=true;
+    }
 }
 
 void* get_page_data(Pager* pager,int page_number){
@@ -96,8 +127,11 @@ void close_sqlyt_db(Table* table){
     printf("close:%d\n",close_result);
 }
 
-void* get_row_insert_location(Table* table, int row_number){
-    int page_num,row_offset,byte_offset;
+void* get_cursor_page_data(Cursor* cursor){
+    int page_num,row_offset,byte_offset,row_number;
+    Table* table;
+    row_number=cursor->row_number;
+    table = cursor->table;
     page_num = row_number / ROWS_PER_PAGE;
     void* page = get_page_data(table->file_pager, page_num);
     row_offset = row_number % ROWS_PER_PAGE;

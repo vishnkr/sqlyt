@@ -40,7 +40,6 @@ int process_meta_command(InputBuffer* input_buffer,Table* table){
     if(strncmp(input_buffer->buffer,".",1)==0){
     if(strncmp(input_buffer->buffer+1,"exit",4)==0){
         close_sqlyt_db(table);
-        printf("hello");
         free_pager_table(table);
         clear_input_buffer(input_buffer);
     }
@@ -100,22 +99,26 @@ void deserialize_data(void* src_row, Row* dest_row){
 }   
 
 int execute_insert(Statement* statement, Table* table){
+    Cursor* cursor = init_end_cursor(table);
     //check if table is full
     if(table->number_of_rows==MAX_ROWS){
         return STATEMENT_FAILURE;
     }
-    serialize_data(&(statement->insert_row),get_row_insert_location(table,table->number_of_rows));
+    serialize_data(&(statement->insert_row),get_cursor_page_data(cursor));
     table->number_of_rows+=1;
     return STATEMENT_SUCCESS;
 
 }
 
 int execute_select(Statement* statement, Table* table){
+    Cursor* cursor = init_start_cursor(table);
     Row ret_row;
-    for(int row=0;row<table->number_of_rows;row++){
-        deserialize_data(get_row_insert_location(table,row),&ret_row);
+    while(!cursor->is_end){
+        deserialize_data(get_cursor_page_data(cursor),&ret_row);
         printf("%d| %s| %s\n",ret_row.row_id,ret_row.col1,ret_row.col2);
+        increment_cursor(cursor);
     }
+    free(cursor);
     return 0;
 }
 
