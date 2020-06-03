@@ -6,7 +6,7 @@
 #define META_FAILURE -1
 
 
-typedef struct {
+typedef struct InputBuffer {
     char* buffer;
     size_t buffer_size;
     ssize_t input_size;
