@@ -10,6 +10,15 @@
 #define STATEMENT_FAILURE -1
 
 
+extern const uint32_t ROW_ID_SIZE;
+extern const uint32_t COL_1_SIZE;
+extern const uint32_t COL_2_SIZE;
+extern const uint32_t ROW_SIZE;
+extern const uint32_t PAGE_SIZE;
+extern const uint32_t ROWS_PER_PAGE;
+extern const uint32_t MAX_ROWS;
+extern const uint32_t COL_1_OFFSET;
+extern const uint32_t COL_2_OFFSET;
 
 typedef enum{
     INSERT_STATEMENT,
