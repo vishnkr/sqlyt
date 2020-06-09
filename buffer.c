@@ -1,4 +1,3 @@
-
 #include "buffer.h"
 
 InputBuffer* new_input_buffer(){
@@ -6,7 +5,6 @@ InputBuffer* new_input_buffer(){
     inp_buffer->buffer=NULL;
     inp_buffer->buffer_size = 0;
     inp_buffer->input_size = 0;
-
     return inp_buffer;
 }
 

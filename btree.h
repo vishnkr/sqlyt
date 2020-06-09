@@ -8,13 +8,10 @@ typedef enum {
 } NodeType;
 
 
-//regular NODE HEADER
-const uint32_t NODETYPE_SIZE = sizeof(uint8_t);
-const uint32_t IS_ROOT_SIZE = sizeof(uint8_t);
-const uint32_t IS_ROOT_OFFSET = IS_ROOT_SIZE;
-const uint32_t POINTER_PARENT_SIZE = sizeof(uint32_t);
-const uint32_t POINTER_PARENT_OFFSET = IS_ROOT_OFFSET+IS_ROOT_SIZE;
-const uint32_t HEADER_NODE_SIZE = NODETYPE_SIZE+IS_ROOT_SIZE+POINTER_PARENT_SIZE;
+uint32_t* leaf_node_number(void* node);
 
-//leaf node header
-const uint32_t 
+void init_leaf(void* node);
+
+void* get_leaf_node_cell(void* node,uint32_t cell_number );
+
+uint32_t* get_leaf_key(void* node,uint32_t cell_number);
