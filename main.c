@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "buffer.h"
 #include "memory.h"
 
@@ -44,7 +46,7 @@ void print_help_info(){
 void print_prompt(){
     printf("sqlyt db > ");
 }
-
+// check if entered comman is a valid meta command and take appropriate actions
 int process_meta_command(InputBuffer* input_buffer,Table* table){
     if(strncmp(input_buffer->buffer,".",1)==0){
     if(strncmp(input_buffer->buffer+1,"exit",4)==0){
@@ -64,7 +66,7 @@ int process_meta_command(InputBuffer* input_buffer,Table* table){
 }
 
 
-
+// prepare sql statement to determine type of operation
 int prepare_sql_statement(Statement* statement, InputBuffer* input_buffer){
     
     if(strncmp(input_buffer->buffer,"select",6)==0){
@@ -134,6 +136,12 @@ int execute_select(Statement* statement, Table* table){
 int main(int argc, char* argv[]){
     print_help_info();
     InputBuffer* input_buffer = new_input_buffer();
+    if (mkdir("db_files", 0777) == -1) {
+        printf("ERROR creating directory 'db_files'\n");
+    }
+    else{
+        printf("db_files does not exist. Directory created\n");
+    }
     Table* sample_table = init_sqlyt_db(argv[1]);
     printf("Opening file: db_files/%s\n",argv[1]);
     while(true){
@@ -156,7 +164,7 @@ int main(int argc, char* argv[]){
                 execute_sql_statement(&sql_statement,sample_table);
                 //free_table(sample_table);
                 break;
-            case STATEMENT_FAILURE: //not possible currently
+            case STATEMENT_FAILURE:
                 break;
             default:
                 break;
