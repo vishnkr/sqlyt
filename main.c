@@ -60,6 +60,7 @@ int process_meta_command(InputBuffer* input_buffer,Table* table){
     else if(strncmp(input_buffer->buffer+1,"info",4)==0){
         print_help_info();
     }
+    
     else{
             printf("'%s' - meta command not recognised\n",input_buffer->buffer);
             return META_FAILURE;
@@ -83,6 +84,7 @@ int prepare_sql_statement(Statement* statement, InputBuffer* input_buffer){
     } 
     else{
         printf("invalid statement\n");
+        return -1;
     }
     return 0;
 }    
@@ -188,7 +190,7 @@ int main(int argc, char* argv[]){
                 execute_sql_statement(&sql_statement,sample_table);
                 //free_table(sample_table);
                 break;
-            case STATEMENT_FAILURE: //not possible currently
+            case STATEMENT_FAILURE: 
                 break;
             default:
                 break;

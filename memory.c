@@ -58,7 +58,7 @@ uint32_t* get_leaf_key(void* node,uint32_t cell_number){
     return get_leaf_node_cell(node, cell_number);
 }
 
-void* get_leaf_node_value(void* node, uint32_t cell_number){
+void* get_leaf_value(void* node, uint32_t cell_number){
     return get_leaf_node_cell(node, cell_number) + LEAF_NODE_KEY_SIZE;
 }
 
@@ -181,4 +181,22 @@ void free_pager_table(Table* table){
     }
     free(table->file_pager);
     free(table);
+}
+
+void print_constants() {
+    printf("ROW_SIZE: %d\n", ROW_SIZE);
+    printf("COMMON_NODE_HEADER_SIZE: %d\n", HEADER_NODE_SIZE);
+    printf("LEAF_NODE_HEADER_SIZE: %d\n", LEAF_NODE_HEADER_SIZE);
+    printf("LEAF_NODE_CELL_SIZE: %d\n", LEAF_NODE_CELL_SIZE);
+    printf("LEAF_NODE_SPACE_FOR_CELLS: %d\n", LEAF_NODE_SPACE_FOR_CELLS);
+    printf("LEAF_NODE_MAX_CELLS: %d\n", LEAF_MAX_CELLS);
+}
+
+void print_leaf_node(void* node) {
+    uint32_t num_cells = *leaf_node_number_cells(node);
+    printf("leaf (size %d)\n", num_cells);
+    for (uint32_t i = 0; i < num_cells; i++) {
+        uint32_t key = *get_leaf_key(node, i);
+        printf("  - %d : key = %d, val1 = %s\n", i, key);
+    }
 }

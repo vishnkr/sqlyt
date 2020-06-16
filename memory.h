@@ -54,12 +54,6 @@ void* get_cursor_value(Cursor* cursor);
 void free_pager_table(Table* table);
 
 
-typedef enum {
-    INTERNAL_NODE,
-    LEAF_NODE
-} NodeType;
-
-
 uint32_t* leaf_node_number_cells(void* node);
 
 void init_leaf(void* node);
@@ -70,6 +64,7 @@ uint32_t* get_leaf_key(void* node,uint32_t cell_number);
 
 void* get_leaf_node_value(void* node, uint32_t cell_number);
 
-
+void print_constants();
+void print_leaf_node(void* node) ;
 
 #endif
