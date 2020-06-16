@@ -1,39 +1,32 @@
-
-#include <stdio.h>
-#include <stdint.h>
 #include "btree.h"
 
+//This file is supposed to have functions associated with B+ tree used for storing data and B-tree for indexing
+/*
+Node type: children type : min children : max children : ex(b=7)
+root : records or internal or leaf: 1(if only node)/else 2: b-1/else b: 1-6/2-7
+internal node: internal nodes or leaf: floor(b/2): b: 4-7
+leaf node: records : floor(b/2): b: 4-7
 
 
-//regular NODE HEADER
-const uint32_t NODE_TYPE_SIZE = sizeof(uint8_t);
-const uint32_t IS_ROOT_SIZE = sizeof(uint8_t);
-const uint32_t IS_ROOT_OFFSET = IS_ROOT_SIZE;
-const uint32_t POINTER_PARENT_SIZE = sizeof(uint32_t);
-const uint32_t POINTER_PARENT_OFFSET = IS_ROOT_OFFSET+IS_ROOT_SIZE;
-const uint32_t HEADER_NODE_SIZE = NODETYPE_SIZE+IS_ROOT_SIZE+POINTER_PARENT_SIZE;
+For an order-m tree…	Internal Node	Leaf Node
+Stores	keys and pointers to children	keys and values
+Number of keys	up to m-1	as many as will fit
+Number of pointers	number of keys + 1	none
+Number of values	none	number of keys
+Key purpose	used for routing paired with value
+Stores values?	No	Yes
 
-//leaf node header
-const uint32_t LEAF_NODE_CELL_SIZE = sizeof(uint32_t);
-const uint32_t LEAF_NODE_CELL_OFFSET = HEADER_NODE_SIZE;
-const uint32_t LEAF_NODE_HEADER_SIZE = LEAF_NODE_CELL_OFFSET + LEAF_NODE_CELL_SIZE;
+ex: when order = 3
+up to 3 children per internal node
+up to 2 keys per internal node
+at least 2 children per internal node
+at least 1 key per internal node
+*/
 
-uint32_t* leaf_node_number_cells(void* node){
-    return node+ LEAF_NODE_CELL_OFFSET;
-}
 
-void* get_leaf_node_cell(void* node,uint32_t cell_number ){
-    return node + LEAF_NODE_HEADER_SIZE + cell_number * LEAF_NODE_CELL_SIZE;
-}
-
-void init_leaf(void* node){
-    *leaf_node_number_cells(node) = 0;
-}
-
-uint32_t* get_leaf_key(void* node,uint32_t cell_number){
-    return get_leaf_node_cell(node, cell_num);
-}
-
-void* get_leaf_node_value(void* node, uint32_t cell_number){
-    return get_leaf_node_cell(node, cell_num);
+BtreeNode* setup_btree(bool isleaf){
+    BtreeNode* btree = (BtreeNode)malloc(sizeof(BtreeNode));
+    btree->isleaf = isleaf;
+    btree->keys = malloc()
+    return btree;
 }
