@@ -30,3 +30,7 @@ BtreeNode* setup_btree(bool isleaf){
     btree->keys = malloc()
     return btree;
 }
+//TODO
+void btree_insert();
+void btree_search();
+void btree_delete();

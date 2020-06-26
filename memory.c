@@ -172,7 +172,7 @@ void* get_cursor_value(Cursor* cursor){
     table = cursor->table;
     page_number = cursor->page_number;
     void* page = get_page_data(table->file_pager, page_number);
-    return get_leaf_node_value(page,cursor->cell_number);
+    return get_leaf_value(page,cursor->cell_number);
 }
 
 void free_pager_table(Table* table){
@@ -197,6 +197,6 @@ void print_leaf_node(void* node) {
     printf("leaf (size %d)\n", num_cells);
     for (uint32_t i = 0; i < num_cells; i++) {
         uint32_t key = *get_leaf_key(node, i);
-        printf("  - %d : key = %d, val1 = %s\n", i, key);
+        printf("  - %d : key = %d\n", i, key);
     }
 }

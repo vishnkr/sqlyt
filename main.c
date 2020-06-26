@@ -129,7 +129,7 @@ void leaf_node_insert(Cursor* cursor, uint32_t key, Row* row){
     }
     *(leaf_node_number_cells(node))+=1;
     *(get_leaf_key(node,cursor->cell_number)) = key;
-    serialize_data(row,get_leaf_node_value(node,cursor->cell_number));
+    serialize_data(row,get_leaf_value(node,cursor->cell_number));
 
 }
 
@@ -162,14 +162,9 @@ int main(int argc, char* argv[]){
     print_help_info();
     InputBuffer* input_buffer = new_input_buffer();
     if (mkdir("db_files", 0777) == -1) {
-        printf("ERROR creating directory 'db_files', db_files already exists\n");
-
-    if (mkdir("db_files", 0777) == -1) {
-        printf("ERROR creating directory 'db_files'\n");
-
-    }
+        printf("db_files already exists\n");
     else{
-        printf("db_files does not exist. Directory created\n");
+        printf("db_files directory created\n");
     }
     Table* sample_table = init_sqlyt_db(argv[1]);
     printf("Opening file: db_files/%s\n",argv[1]);
@@ -202,4 +197,5 @@ int main(int argc, char* argv[]){
     }
     printf("\n");
     return 0;
+}
 }

@@ -62,7 +62,7 @@ void* get_leaf_node_cell(void* node,uint32_t cell_number );
 
 uint32_t* get_leaf_key(void* node,uint32_t cell_number);
 
-void* get_leaf_node_value(void* node, uint32_t cell_number);
+void* get_leaf_value(void* node, uint32_t cell_number);
 
 void print_constants();
 void print_leaf_node(void* node) ;
